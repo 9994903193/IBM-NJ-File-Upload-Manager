@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>IBM-NJ File Upload Manager</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 30px;
+    background: #f4f6f8;
+  }
+  h1 {
+    color: #0052cc;
+  }
+  #upload-section {
+    border: 2px solid #0052cc;
+    padding: 20px;
+    background: white;
+    width: 400px;
+    border-radius: 8px;
+  }
+  input[type="file"] {
+    display: block;
+    margin-bottom: 15px;
+  }
+  #file-list {
+    margin: 15px 0;
+    list-style: none;
+    padding-left: 0;
+  }
+  #file-list li {
+    background: #e6f0ff;
+    margin-bottom: 8px;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  .progress-bar {
+    height: 10px;
+    background: #0052cc;
+    border-radius: 4px;
+    width: 0%;
+    transition: width 0.3s;
+  }
+  button {
+    background: #0052cc;
+    border: none;
+    color: white;
+    padding: 10px 15px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:disabled {
+    background: #a3bff9;
+    cursor: not-allowed;
+  }
+</style>
+</head>
+<body>
+  <h1>IBM-NJ File Upload Manager</h1>
+  <div id="upload-section">
+    <input type="file" id="file-input" multiple />
+    <ul id="file-list"></ul>
+    <button id="upload-btn" disabled>Upload Files</button>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const uploadBtn = document.getElementById('upload-btn');
+
+    let filesToUpload = [];
+
+    fileInput.addEventListener('change', () => {
+      filesToUpload = Array.from(fileInput.files);
+      renderFileList();
+      uploadBtn.disabled = filesToUpload.length === 0;
+    });
+
+    function renderFileList() {
+      fileList.innerHTML = '';
+      filesToUpload.forEach((file, idx) => {
+        const li = document.createElement('li');
+        li.textContent = file.name + ` (${(file.size / 1024).toFixed(2)} KB)`;
+
+        const progressBar = document.createElement('div');
+        progressBar.className = 'progress-bar';
+        progressBar.id = `progress-${idx}`;
+
+        li.appendChild(progressBar);
+        fileList.appendChild(li);
+      });
+    }
+
+    uploadBtn.addEventListener('click', () => {
+      uploadBtn.disabled = true;
+      simulateUpload(0);
+    });
+
+    function simulateUpload(index) {
+      if (index >= filesToUpload.length) {
+        alert('All files uploaded successfully!');
+        fileInput.value = '';
+        filesToUpload = [];
+        renderFileList();
+        uploadBtn.disabled = true;
+        return;
+      }
+
+      let progress = 0;
+      const progressBar = document.getElementById(`progress-${index}`);
+
+      const interval = setInterval(() => {
+        if (progress >= 100) {
+          clearInterval(interval);
+          simulateUpload(index + 1);
+        } else {
+          progress += 10 + Math.random() * 20; // Increment progress randomly for fun
+          if (progress > 100) progress = 100;
+          progressBar.style.width = progress + '%';
+        }
+      }, 300);
+    }
+  </script>
+</body>
+</html>
